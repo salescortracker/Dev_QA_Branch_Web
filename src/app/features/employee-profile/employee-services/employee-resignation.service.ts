@@ -55,6 +55,14 @@ export interface Reference {
   email: string;
   mobileNumber: string;
 }
+export interface UpdateResignationStatusRequest {
+    resignationId: number;
+    status: string;
+    managerReason?: string;
+    isManagerApprove: boolean;
+    isManagerReject: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,39 +70,111 @@ export class EmployeeResignationService {
 private apiUrl = environment.apiUrl + '/Employee';
 private apiadminUrl = environment.apiUrl + '/UserManagement';
   constructor(private http: HttpClient) { }
-// GET all resignations
-  getAll(companyId: number, regionId: number, roleId: Number): Observable<EmployeeResignation[]> {
+  // ================= EMPLOYEE =================
+
+  // ✅ GET ALL RESIGNATIONS
+  getAll(
+    companyId: number,
+    regionId: number,
+    roleId: number
+  ): Observable<EmployeeResignation[]> {
     return this.http.get<EmployeeResignation[]>(
-      `${this.apiUrl}/GetResignations?companyId=${companyId}&regionId=${regionId}&roleId=${roleId}`
+      `${this.apiUrl}/GetResignations`,
+      {
+        params: {
+          companyId,
+          regionId,
+          roleId
+        }
+      }
     );
   }
 
-  // GET resignation by ID
-  getById(id: number): Observable<EmployeeResignation> {
-    return this.http.get<EmployeeResignation>(
-      `${this.apiUrl}/GetResignationById?id=${id}`
+  // ✅ CREATE RESIGNATION
+  create(data: EmployeeResignation): Observable<EmployeeResignation> {
+    return this.http.post<EmployeeResignation>(
+      `${this.apiUrl}/SaveResignation`,
+      data
     );
   }
 
-  // CREATE resignation
-  create(model: EmployeeResignation): Observable<any> {
-    return this.http.post(`${this.apiUrl}/SaveResignation`, model);
+  // ✅ UPDATE RESIGNATION
+  update(id: number, data: EmployeeResignation): Observable<EmployeeResignation> {
+    return this.http.post<EmployeeResignation>(
+      `${this.apiUrl}/UpdateResignation/${id}`,
+      data
+    );
   }
 
-  // UPDATE resignation
-  update(id: number, model: EmployeeResignation): Observable<any> {
-    return this.http.post(`${this.apiUrl}/UpdateResignation/${id}`, model);
-  }
-
-  delete(id: number): Observable<any> {
-    const companyId = sessionStorage.getItem("CompanyId");
-    const regionId = sessionStorage.getItem("RegionId");
-    const roleId = sessionStorage.getItem("roleId");
-
+  // ✅ DELETE RESIGNATION
+  delete(
+    id: number,
+    companyId: number,
+    regionId: number,
+    roleId: number
+  ): Observable<any> {
     return this.http.delete(
-      `${this.apiUrl}/DeleteResignation/${id}?companyId=${companyId}&regionId=${regionId}&roleId=${roleId}`
+      `${this.apiUrl}/DeleteResignation/${id}`,
+      {
+        params: {
+          companyId,
+          regionId,
+          roleId
+        }
+      }
     );
   }
+
+  // ================= MANAGER =================
+
+  // ✅ GET RESIGNATIONS FOR REPORTING MANAGER
+getResignationsForManager(managerUserId: number): Observable<EmployeeResignation[]> {
+  return this.http.get<EmployeeResignation[]>(
+    `${this.apiUrl}/GetResignationsForManager`,
+    {
+      params: {
+        managerUserId
+      }
+    }
+  );
+}
+
+
+  // ✅ MANAGER APPROVE / REJECT
+  updateStatus(payload: {
+    resignationId: number;
+    status: string;
+    managerReason?: string;
+    isManagerApprove: boolean;
+      hrReason?: string;      // ✅ add this
+  isHRApprove?: boolean;  // ✅ add this
+  isHRReject?: boolean;   // ✅ add this
+
+    isManagerReject: boolean;
+  }): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/UpdateResignationStatus`,
+      payload
+    );
+  }
+
+  // ================= HR (optional la
+// ✅ GET RESIGNATIONS FOR HR (FIXED)
+getResignationsForHR(): Observable<EmployeeResignation[]> {
+  const companyId = Number(sessionStorage.getItem('CompanyId'));
+  const regionId = Number(sessionStorage.getItem('RegionId'));
+
+  return this.http.get<EmployeeResignation[]>(
+    `${this.apiUrl}/GetResignationsForHR`,
+    {
+      params: { companyId, regionId }
+    }
+  );
+}
+
+
+
+
   // 🔹 GET PERSONAL DETAILS BY USER ID
   GetByUserIdempProfile(userId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/GetByUserIdempProfile/${userId}`);

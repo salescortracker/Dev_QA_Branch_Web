@@ -14,4 +14,15 @@ export interface EmployeeResignation {
   regionId?: number;
   userId?: number;
   employeeCode?: number; 
+    // ✅ ADD THESE
+  managerComments?: string;
+  managerApprovedDate?: Date;
+  managerRejectedDate?: Date;
+  // UI-only fields
+  approveChecked?: boolean;
+  rejectChecked?: boolean;
+
+    managerReason?: string;
+  hrReason?: string;
+
 }

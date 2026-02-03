@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { EmployeeResignationService } from '../../employee-services/employee-resignation.service';
+import { EmployeeResignation } from '../../employee-models/EmployeeResignation';
+import { commonConstants } from '../../../../core/common';
 import { NgForm } from '@angular/forms';
-import { EmployeeResignationService } from '../employee-services/employee-resignation.service';
-import { EmployeeResignation } from '../employee-models/EmployeeResignation';
-import { commonConstants } from '../../../core/common';
 type ColumnKey =
   | 'showIndex'
   | 'type'
@@ -12,18 +12,19 @@ type ColumnKey =
   | 'status'
   | 'actions';
 @Component({
-  selector: 'app-employee-resignation',
+  selector: 'app-employeeresginationdetails',
   standalone: false,
-  templateUrl: './employee-resignation.component.html',
-  styleUrl: './employee-resignation.component.css'
+  templateUrl: './employeeresginationdetails.component.html',
+  styleUrl: './employeeresginationdetails.component.css'
 })
-export class EmployeeResignationComponent {
-  resignations: EmployeeResignation[] = [];
+export class EmployeeresginationdetailsComponent {
+   resignations: EmployeeResignation[] = [];
   filteredResignations: EmployeeResignation[] = [];
   resignationModel: EmployeeResignation = { resignationType: '' };
-  filter = { resignationType: '', fromDate: '', toDate: '' };
+
   employeeCode = commonConstants.employeeCode;
   employeeName = commonConstants.employeeName;
+  filter = { resignationType: '', fromDate: '', toDate: '' };
   message = '';
   isEditMode = false;
   dateError = '';
@@ -36,11 +37,12 @@ export class EmployeeResignationComponent {
   totalPagesArray: number[] = [];
 
   // Session Values
-  companyId = Number(sessionStorage.getItem("CompanyId"));
-  regionId = Number(sessionStorage.getItem("RegionId"));
-  // employeeCode = sessionStorage.getItem("EmployeeCode") || "";
-  roleId = Number(sessionStorage.getItem("roleId"));
- activeTab: 'list' | 'manager' | 'hr' = 'list'; // default tab
+  companyId = Number(sessionStorage.getItem('CompanyId'));
+  regionId = Number(sessionStorage.getItem('RegionId'));
+  roleId = Number(sessionStorage.getItem('roleId'));
+
+  activeTab: 'list' | 'manager' | 'hr' = 'list';
+
   constructor(private resignationService: EmployeeResignationService) {}
 
   ngOnInit(): void {
@@ -154,12 +156,11 @@ export class EmployeeResignationComponent {
       this.dateError
     ) return;
 
-    // Add CompanyId + RegionId before saving
+    this.resignationModel.userId = Number(sessionStorage.getItem('UserId'));
+    this.resignationModel.employeeId = sessionStorage.getItem('EmployeeCode') || '';
     this.resignationModel.companyId = this.companyId;
     this.resignationModel.regionId = this.regionId;
-    this.resignationModel.userId = this.roleId;
-  // this.resignationModel.employeeId = sessionStorage.getItem("EmployeeCode") || '';
-    
+
     const apiCall = this.isEditMode && this.resignationModel.resignationId
       ? this.resignationService.update(this.resignationModel.resignationId, this.resignationModel)
       : this.resignationService.create(this.resignationModel);
@@ -183,10 +184,20 @@ export class EmployeeResignationComponent {
     this.resignationModel = { ...item };
     this.isEditMode = true;
   }
+
+  // ---------------- DELETE FIXED ----------------
+loadForManager() {
+  const managerUserId = Number(sessionStorage.getItem('UserId'));
+  this.resignationService
+    .getResignationsForManager(managerUserId) // ✅ pass companyId, regionId
+    .subscribe((res: EmployeeResignation[]) => {
+      this.filteredResignations = res;
+    });
+}
 deleteResignation(id: number) {
   if (confirm('Are you sure you want to delete this resignation?')) {
     this.resignationService
-      .delete(id, this.companyId, this.regionId, this.roleId) // ✅ pass all 4 args
+      .delete(id, this.companyId, this.regionId, this.roleId) // pass all 4 args
       .subscribe({
         next: () => {
           this.message = 'Resignation deleted successfully!';
@@ -197,17 +208,6 @@ deleteResignation(id: number) {
   }
 }
 
-loadForManager() {
-  const managerUserId = Number(sessionStorage.getItem('UserId'));
-  this.resignationService
-    .getResignationsForManager(managerUserId) // ✅ pass companyId, regionId
-    .subscribe((res: EmployeeResignation[]) => {
-      this.filteredResignations = res;
-    });
-}
-
-
-
 
   resetForm(form: NgForm) {
     form.resetForm();
@@ -216,6 +216,4 @@ loadForManager() {
     this.dateError = '';
     this.formSubmitted = false;
   }
-  
- 
 }
