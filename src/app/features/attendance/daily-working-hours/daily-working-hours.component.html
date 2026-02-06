@@ -15,7 +15,8 @@
   <!-- Assign Daily Working Hours Form -->
   <div class="card p-4 mb-4 shadow-sm">
     <h5 class="mb-3">Assign Daily Working Hours to Employees</h5>
-    <form id="dailyWorkingHoursForm">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
       <div class="row mb-3">
         <!-- Employee Multi-select -->
         <div class="col-md-6">
@@ -25,34 +26,32 @@
             <label for="employeeDropdown" class="dropdown-label">Select Employees</label>
             <div class="dropdown-menu">
               <label class="dropdown-item">
-                <input type="checkbox" class="employee" value="all"> Select All
+                <input type="checkbox" (change)="toggleSelectAll($event)"> Select All
               </label>
-              <label class="dropdown-item">
-                <input type="checkbox" class="employee" value="EMP001"> John Doe (EMP001)
-              </label>
-              <label class="dropdown-item">
-                <input type="checkbox" class="employee" value="EMP003"> Anita Sharma (EMP003)
-              </label>
-              <label class="dropdown-item">
-                <input type="checkbox" class="employee" value="EMP007"> Rahul Kumar (EMP007)
-              </label>
-              <label class="dropdown-item">
-                <input type="checkbox" class="employee" value="EMP010"> Priya Singh (EMP010)
+              <label class="dropdown-item" *ngFor="let user of users">
+                <input 
+                  type="checkbox" 
+                  [value]="user.employeeCode" 
+                  (change)="toggleEmployeeSelection(user.employeeCode, $event)"
+                  [checked]="selectedEmployees.includes(user.employeeCode)">
+                {{user.fullName}} ({{user.employeeCode}})
               </label>
             </div>
+
           </div>
         </div>
 
         <!-- Shift Selection -->
-        <div class="col-md-6">
-          <label class="form-label">Select Shift <span class="text-danger">*</span></label>
-          <select class="form-select" required>
+    <div class="col-md-4">
+          <label class="form-label">Shift <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="shiftID">
             <option value="">Select Shift</option>
-            <option>Morning Shift (09:00 - 17:30)</option>
-            <option>Evening Shift (14:00 - 22:30)</option>
-            <option>Night Shift (22:00 - 06:00)</option>
+            <option *ngFor="let s of shifts" [value]="s.shiftID">
+              {{ s.shiftName }} ({{ s.shiftStartTime }} - {{ s.shiftEndTime }})
+            </option>
           </select>
         </div>
+
       </div>
 
       <!-- Daily Working Hours -->
@@ -73,16 +72,16 @@
           <tr>
             <td>Monday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+                 <input type="checkbox"  class="form-check-input" formControlName="mondayWorking">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+             <input type="time" class="form-control" formControlName="mondayStart">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="mondayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 8" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 8" [value]="calculateTotalHours(form.get('mondayStart')?.value, form.get('mondayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -90,16 +89,16 @@
           <tr>
             <td>Tuesday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox"  class="form-check-input" formControlName="tuesdayWorking">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+               <input type="time" class="form-control" formControlName="tuesdayStart">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="tuesdayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 8" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 8" [value]="calculateTotalHours(form.get('tuesdayStart')?.value, form.get('tuesdayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -107,16 +106,16 @@
           <tr>
             <td>Wednesday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox" class="form-check-input" formControlName="wednesdayWorking">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="wednesdayStart">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="wednesdayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 8" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 8" [value]="calculateTotalHours(form.get('wednesdayStart')?.value, form.get('wednesdayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -124,16 +123,16 @@
           <tr>
             <td>Thursday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox"  class="form-check-input" formControlName="thursdayWorking">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="thursdayStart">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="thursdayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 8" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 8" [value]="calculateTotalHours(form.get('thursdayStart')?.value, form.get('thursdayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -141,16 +140,16 @@
           <tr>
             <td>Friday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox"  class="form-check-input" formControlName="fridayWorking">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="fridayStart">
             </td>
             <td>
-              <input type="time" class="form-control" required>
+              <input type="time" class="form-control" formControlName="fridayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 8" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 8" [value]="calculateTotalHours(form.get('fridayStart')?.value, form.get('fridayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -158,16 +157,16 @@
           <tr>
             <td>Saturday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox"  class="form-check-input" formControlName="saturdayWorking">
             </td>
             <td>
-              <input type="time" class="form-control">
+              <input type="time" class="form-control" formControlName="saturdayStart">
             </td>
             <td>
-              <input type="time" class="form-control">
+              <input type="time" class="form-control" formControlName="saturdayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 0" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 0" [value]="calculateTotalHours(form.get('saturdayStart')?.value, form.get('saturdayEnd')?.value)" readonly>
             </td>
           </tr>
 
@@ -175,16 +174,16 @@
           <tr>
             <td>Sunday</td>
             <td class="text-center">
-              <input type="checkbox" class="form-check-input">
+              <input type="checkbox"  class="form-check-input" formControlName="sundayWorking">
             </td>
             <td>
-              <input type="time" class="form-control">
+              <input type="time" class="form-control"formControlName="sundayStart">
             </td>
             <td>
-              <input type="time" class="form-control">
+              <input type="time" class="form-control" formControlName="sundayEnd">
             </td>
             <td>
-              <input type="text" class="form-control" placeholder="e.g., 0" readonly>
+              <input type="text" class="form-control" placeholder="e.g., 0" [value]="calculateTotalHours(form.get('sundayStart')?.value, form.get('sundayEnd')?.value)"  readonly>
             </td>
           </tr>
         </tbody>
@@ -218,30 +217,22 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>John Doe</td>
-          <td>Morning Shift</td>
-          <td>Monday</td>
-          <td>09:00</td>
-          <td>17:30</td>
-          <td>Active</td>
+        <tr *ngFor="let row of assignedList">
+          <td>{{ row.employeeName  }}</td>
+          <td>{{ row.shiftName }}</td>
+          <td>{{ row.dayOfWeek }}</td>
+          <td>{{ row.startTime  }}</td>
+          <td>{{ row.endTime  }}</td>
+            <td>
+              <span class="badge bg-success" *ngIf="row.isWorking">Working</span>
+              <span class="badge bg-secondary" *ngIf="!row.isWorking">Off</span>
+            </td>
           <td>
-            <button class="btn btn-sm btn-primary">Edit</button>
-            <button class="btn btn-sm btn-danger">Delete</button>
+                <!-- <button (click)="updateRow(row)">Update</button> -->
+                <button (click)="deleteRow(row.dailyWorkingHourId)">Delete</button>
+
           </td>
-        </tr>
-        <tr>
-          <td>Anita Sharma</td>
-          <td>Evening Shift</td>
-          <td>Tuesday</td>
-          <td>14:00</td>
-          <td>22:30</td>
-          <td>Active</td>
-          <td>
-            <button class="btn btn-sm btn-primary">Edit</button>
-            <button class="btn btn-sm btn-danger">Delete</button>
-          </td>
-        </tr>
+  </tr>
       </tbody>
     </table>
   </div>

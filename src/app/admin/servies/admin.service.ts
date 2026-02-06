@@ -500,6 +500,25 @@ export interface ClockInOutDto {
   time: string;            // HH:mm format
   createdBy?: number;      // user ID
 }
+
+
+// Create this in a new file: models/daily-working-hour.model.ts
+export interface DailyWorkingHourDto {
+  employeeCode: string;
+  dayOfWeek: string; // 'Monday', 'Tuesday', etc.
+  isWorkingDay: boolean;
+  startTime: string | null; // Format: '09:00'
+  endTime: string | null;   // Format: '18:00'
+  totalHours: number;
+  shiftId?: number;
+  weekOff: boolean;
+  effectiveFrom?: Date;
+  effectiveTo?: Date;
+  createdBy?: string;
+  createdAt?: Date;
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -1614,5 +1633,37 @@ bulkUploadCertificationTypes(data: CertificationType[]): Observable<any> {
   private getFileName(path: string): string {
   return path.split('/').pop() || 'download';
 }
+
+
+
+
+
+  saveDailyWorkingHours(data: any[]) {
+  return this.http.post(
+    `${this.baseUrl}/Attendance/saveDailyWorkingHour`,
+    data
+  );
+  }
+
+  getDailyWorkingHours() {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/Attendance/get-all-DailyWorkingHour`
+    );
+  }
+
+  updateDailyWorkingHour(id: number, data: any) {
+  return this.http.put(
+    `${this.baseUrl}/Attendance/update-DailyWorkingHour/${id}`,
+    data
+  );
+}
+
+deleteDailyWorkingHour(id: number) {
+  return this.http.delete(
+    `${this.baseUrl}/Attendance/delete-DailyWorkingHour/${id}`
+  );
+}
+
+
 
 }
