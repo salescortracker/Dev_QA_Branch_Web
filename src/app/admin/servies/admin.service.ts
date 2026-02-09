@@ -434,6 +434,7 @@ export interface ShiftMasterDto {
   shiftStartTime?: string; // e.g. "09:00:00" or ISO time string
   shiftEndTime?: string;
   graceTime?: number;
+  overtimeAllowed?: boolean;   // ✅ ADD THIS
   isActive?: boolean;
   companyID?: number;
   regionID?: number;
@@ -1403,31 +1404,31 @@ downloadDDCopy(fileName: string): Observable<Blob> {
   // SHIFT MASTER
   // -------------------------------
   getAllShifts(): Observable<ShiftMasterDto[]> {
-    return this.http.get<ShiftMasterDto[]>(`${this.baseUrl}/UserManagement/GetAllShifts`);
+    return this.http.get<ShiftMasterDto[]>(`${this.baseUrl}/Attendance/GetAllShifts`);
   }
 
   getShiftById(shiftId: number): Observable<ShiftMasterDto> {
-    return this.http.get<ShiftMasterDto>(`${this.baseUrl}/UserManagement/GetShiftById/${shiftId}`);
+    return this.http.get<ShiftMasterDto>(`${this.baseUrl}/Attendance/GetShiftById/${shiftId}`);
   }
 
   addShift(model: ShiftMasterDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/UserManagement/AddShift`, model);
+    return this.http.post(`${this.baseUrl}/Attendance/AddShift`, model);
   }
 
   updateShift(model: ShiftMasterDto): Observable<any> {
-    return this.http.put(`${this.baseUrl}/UserManagement/UpdateShift`, model);
+    return this.http.put(`${this.baseUrl}/Attendance/UpdateShift`, model);
   }
 
   deleteShift(shiftId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/UserManagement/DeleteShift/${shiftId}`);
+    return this.http.delete(`${this.baseUrl}/Attendance/DeleteShift/${shiftId}`);
   }
 
   activateShift(shiftId: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/UserManagement/ActivateShift/${shiftId}`, {});
+    return this.http.put(`${this.baseUrl}/Attendance/ActivateShift/${shiftId}`, {});
   }
 
   deactivateShift(shiftId: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/UserManagement/DeactivateShift/${shiftId}`, {});
+    return this.http.put(`${this.baseUrl}/Attendance/DeactivateShift/${shiftId}`, {});
   }
 
   // -------------------------------

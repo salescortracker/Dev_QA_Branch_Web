@@ -16,27 +16,28 @@
         <div class="row g-3 align-items-end">
           <div class="col-md-3">
             <label class="form-label">Shift Name</label>
-            <input type="text" class="form-control" [(ngModel)]="newSetting.shiftName" name="shiftName" required placeholder="Enter shift name">
+            <input [(ngModel)]="newSetting.shiftName" class="form-control"  name="shiftName">
           </div>
 
           <div class="col-md-3">
             <label class="form-label">Start Time</label>
-            <input type="time" class="form-control" [(ngModel)]="newSetting.startTime" name="startTime" required>
-          </div>
+<input type="time" class="form-control" 
+       [(ngModel)]="newSetting.shiftStartTime"
+       name="shiftStartTime">          </div>
 
           <div class="col-md-3">
             <label class="form-label">End Time</label>
-            <input type="time" class="form-control" [(ngModel)]="newSetting.endTime" name="endTime" required>
+              <input type="time" class="form-control" [(ngModel)]="newSetting.shiftEndTime" name="shiftEndTime" required>
           </div>
 
           <div class="col-md-2">
             <label class="form-label">Grace Period (min)</label>
-            <input type="number" class="form-control" [(ngModel)]="newSetting.gracePeriod" name="gracePeriod">
+            <input type="number" class="form-control" [(ngModel)]="newSetting.graceTime" name="graceTime">
           </div>
 
           <div class="col-md-2 d-flex align-items-center">
             <label class="form-check-label me-2">Overtime</label>
-            <input type="checkbox" class="form-check-input" [(ngModel)]="newSetting.overtimeAllowed" name="overtimeAllowed">
+             <input type="checkbox" class="form-check-input" [(ngModel)]="newSetting.overtimeAllowed" name="overtimeAllowed">
           </div>
 
           <div class="col-md-2 d-flex align-items-center">
@@ -80,12 +81,16 @@
           <tr *ngFor="let s of paginatedSettings(); let i = index">
             <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
             <td>{{ s.shiftName }}</td>
-            <td>{{ s.startTime }}</td>
-            <td>{{ s.endTime }}</td>
-            <td class="text-center">{{ s.gracePeriod }}</td>
-            <td class="text-center">
-              <i [ngClass]="s.overtimeAllowed ? 'fa-solid fa-circle-check text-success' : 'fa-solid fa-circle-xmark text-danger'"></i>
-            </td>
+            <td>{{ s.shiftStartTime }}</td>
+            <td>{{ s.shiftEndTime }}</td>
+            <td class="text-center">{{ s.graceTime }}</td>
+          <td class="text-center">
+  <i [ngClass]="s.overtimeAllowed 
+    ? 'fa-solid fa-circle-check text-success' 
+    : 'fa-solid fa-circle-xmark text-danger'">
+  </i>
+</td>
+
             <td class="text-center">
               <i [ngClass]="s.isActive ? 'fa-solid fa-circle-check text-success' : 'fa-solid fa-circle-xmark text-danger'"></i>
             </td>

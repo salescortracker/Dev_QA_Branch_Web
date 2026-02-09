@@ -1,67 +1,147 @@
-import { Component } from '@angular/core';
-import { AttendanceSetting } from '../../layout/models/attendance-settings.mode';
+import { Component, OnInit } from '@angular/core';
+import { ShiftMasterDto } from '../../servies/admin.service';
+import { AdminService } from '../../servies/admin.service';
+import Swal from 'sweetalert2';
+
+
 @Component({
   selector: 'app-attendance-setting',
   standalone: false,
   templateUrl: './attendance-setting.component.html',
   styleUrl: './attendance-setting.component.css'
 })
-export class AttendanceSettingComponent {
-searchText: string = '';
-  pageSize: number = 5;
-  currentPage: number = 1;
-  isEditMode: boolean = false;
+export class AttendanceSettingComponent implements OnInit {
 
-  newSetting: AttendanceSetting = {
-    id: 0,
+  searchText = '';
+  pageSize = 5;
+  currentPage = 1;
+  isEditMode = false;
+
+  settings: ShiftMasterDto[] = [];
+
+  newSetting: ShiftMasterDto = {
+  shiftID: 0,
+  shiftName: '',
+  shiftStartTime: '',
+  shiftEndTime: '',
+  graceTime: 0,
+  overtimeAllowed: false,
+  isActive: true
+};
+
+  constructor(private adminService: AdminService) {}
+
+  ngOnInit(): void {
+    this.loadShifts();
+  }
+   // ✅ ADD THIS METHOD (THIS WAS MISSING)
+  private normalizeBoolean(value: any): boolean {
+    return value === true || value === 1 || value === '1' || value === 'true';
+  }
+
+loadShifts() {
+  this.adminService.getAllShifts().subscribe(res => {
+    this.settings = res.map(s => ({
+      ...s,
+      shiftStartTime: s.shiftStartTime?.substring(0, 5),
+      shiftEndTime: s.shiftEndTime?.substring(0, 5),
+      overtimeAllowed: this.normalizeBoolean((s as any).overtimeAllowed),
+      isActive: this.normalizeBoolean((s as any).isActive)
+    }));
+  });
+}
+
+aaddOrUpdateSetting() {
+  const action$ = this.isEditMode
+    ? this.adminService.updateShift(this.newSetting)
+    : this.adminService.addShift(this.newSetting);
+
+  action$.subscribe({
+    next: () => {
+      Swal.fire({
+        icon: 'success',
+        title: this.isEditMode ? 'Updated!' : 'Saved!',
+        text: this.isEditMode
+          ? 'Shift updated successfully'
+          : 'Shift added successfully',
+        timer: 1200,
+        showConfirmButton: false
+      }).then(() => {
+        this.loadShifts();
+      });
+    },
+    error: () => {
+      Swal.fire('Error', 'Something went wrong', 'error');
+    }
+  });
+}
+
+
+
+  // EDIT
+editSetting(s: ShiftMasterDto) {
+  this.newSetting = {
+    ...s,
+    shiftStartTime: s.shiftStartTime?.substring(0, 5),
+    shiftEndTime: s.shiftEndTime?.substring(0, 5),
+    overtimeAllowed: this.normalizeBoolean((s as any).overtimeAllowed),
+    isActive: this.normalizeBoolean((s as any).isActive)
+  };
+  this.isEditMode = true;
+  this.loadShifts();
+}
+
+deleteSetting(setting: ShiftMasterDto) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Delete shift "${setting.shiftName}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, delete it'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.adminService.deleteShift(setting.shiftID).subscribe(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Shift deleted successfully',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        this.loadShifts();
+      });
+    }
+  });
+}
+
+ resetForm() {
+  this.newSetting = {
+    shiftID: 0,
     shiftName: '',
-    startTime: '09:00',
-    endTime: '18:00',
-    gracePeriod: 0,
+    shiftStartTime: '09:00',
+    shiftEndTime: '18:00',
     overtimeAllowed: false,
+    graceTime: 0,
     isActive: true
   };
+  this.isEditMode = false;
 
-  settings: AttendanceSetting[] = [
-    { id: 1, shiftName: 'Morning Shift', startTime: '09:00', endTime: '18:00', gracePeriod: 15, overtimeAllowed: true, isActive: true },
-    { id: 2, shiftName: 'Evening Shift', startTime: '14:00', endTime: '22:00', gracePeriod: 10, overtimeAllowed: false, isActive: true }
-  ];
+  Swal.fire({
+    icon: 'info',
+    title: 'Form Reset',
+    timer: 1000,
+    showConfirmButton: false
+  });
+}
 
-  addOrUpdateSetting() {
-    if(this.isEditMode){
-      const index = this.settings.findIndex(s => s.id === this.newSetting.id);
-      if(index > -1) this.settings[index] = { ...this.newSetting };
-    } else {
-      this.newSetting.id = this.settings.length + 1;
-      this.settings.push({ ...this.newSetting });
-    }
-    this.resetForm();
-  }
 
-  editSetting(setting: AttendanceSetting) {
-    this.newSetting = { ...setting };
-    this.isEditMode = true;
-  }
-
-  deleteSetting(setting: AttendanceSetting) {
-    this.settings = this.settings.filter(s => s.id !== setting.id);
-  }
-
-  resetForm() {
-    this.newSetting = {
-      id: 0,
-      shiftName: '',
-      startTime: '09:00',
-      endTime: '18:00',
-      gracePeriod: 0,
-      overtimeAllowed: false,
-      isActive: true
-    };
-    this.isEditMode = false;
-  }
-
+  // SEARCH + PAGINATION
   filteredSettings() {
-    return this.settings.filter(s => s.shiftName.toLowerCase().includes(this.searchText.toLowerCase()));
+    return this.settings.filter(s =>
+      s.shiftName.toLowerCase().includes(this.searchText.toLowerCase())
+    );
   }
 
   totalPages() {
@@ -78,7 +158,7 @@ searchText: string = '';
   }
 
   changePage(page: number) {
-    if(page < 1 || page > this.totalPages()) return;
+    if (page < 1 || page > this.totalPages()) return;
     this.currentPage = page;
   }
 }
