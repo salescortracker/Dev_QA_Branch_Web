@@ -14,7 +14,7 @@ export class EmployeeEducationComponent {
   selectedFile: File | null = null;
 @ViewChild('certificateFileInput')
 certificateFileInput!: ElementRef<HTMLInputElement>;
-  userId!: number;
+  userId: number = Number(sessionStorage.getItem('UserId'));
   companyId!: number;
   regionId!: number;
 
@@ -116,10 +116,14 @@ certificateFileInput!: ElementRef<HTMLInputElement>;
   }
 
   loadModeOfStudy() {
-    this.adminService.getModeOfStudy().subscribe({
-      next: res => this.modeOfStudyList = res,
-      error: err => console.error(err)
-    });
+    this.adminService.getAllModeOfStudy(this.userId).subscribe({
+  next: (res: any) => {
+    this.modeOfStudyList = res?.data || res;
+  },
+  error: (err: any) => {
+    console.error(err);
+  }
+});
   }
 
   public onFilterChange(): void {

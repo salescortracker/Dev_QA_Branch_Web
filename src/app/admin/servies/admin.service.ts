@@ -491,6 +491,16 @@ export interface CertificationType {
   CompanyID?: number;           // optional
   RegionID?: number;            // optional
 }
+export interface ModeOfStudy {
+  modeOfStudyId: number;
+  modeName: string;
+  companyId: number;
+  regionId: number;
+  isActive: boolean;
+  companyName?: string;
+  userId: number;
+  regionName?: string;
+}
 export interface ClockInOutDto {
   attendanceId?: number;   // optional for new records
   employeeCode: string;
@@ -1205,9 +1215,9 @@ deleteEducation(id: number): Observable<any> {
   );
 }
   // Mode of Study
-  getModeOfStudy(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/employee/modeofstudy`);
-  }
+  // getModeOfStudy(): Observable<any[]> {
+  //   return this.http.get<any[]>(`${this.baseUrl}/employee/modeofstudy`);
+  // }
 // ================= CERTIFICATION APIs =================
 
 
@@ -1614,5 +1624,34 @@ bulkUploadCertificationTypes(data: CertificationType[]): Observable<any> {
   private getFileName(path: string): string {
   return path.split('/').pop() || 'download';
 }
+// ---------------- MODE OF STUDY ----------------
 
+getAllModeOfStudy(userId: number) {
+  debugger;
+  return this.http.get<any>(
+    `${this.baseUrl}/MasterData/GetAllModeOfStudy?userId=${userId}`
+  );
+}
+
+createModeOfStudy(data: ModeOfStudy) {
+  debugger;
+  return this.http.post(
+    `${this.baseUrl}/MasterData/CreateModeOfStudy`,
+    data
+  );
+}
+
+updateModeOfStudy(data: any) {
+  return this.http.put(
+    `${this.baseUrl}/MasterData/UpdateModeOfStudy`,
+    data
+  );
+}
+
+deleteModeOfStudy(id: number) {
+  debugger;
+  return this.http.delete(
+    `${this.baseUrl}/MasterData/DeleteModeOfStudy/${id}`
+  );
+}
 }

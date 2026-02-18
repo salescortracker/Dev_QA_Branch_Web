@@ -10,6 +10,7 @@ export class CommonUploadComponent {
  
  @Input() screenName: string = '';
   @Input() visible: boolean = false;
+  @Input() model: any;
   @Output() closePopup = new EventEmitter<void>();
   @Output() fileUploaded = new EventEmitter<File>();
 

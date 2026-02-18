@@ -84,6 +84,7 @@ import { AssetApprovalComponent } from './features/asset/asset-approval/asset-ap
 import { MyAssetComponent } from './features/asset/my-asset/my-asset.component';
 import { TimesheetApplicationComponent } from './features/timesheet/timesheet-application/timesheet-application.component';
 import { TimesheetApprovalComponent } from './features/timesheet/timesheet-approval/timesheet-approval.component';
+import { ModeOfStudyComponent } from './mode-of-study/mode-of-study.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -161,7 +162,8 @@ import { TimesheetApprovalComponent } from './features/timesheet/timesheet-appro
     AssetApprovalComponent,
     MyAssetComponent,
     TimesheetApplicationComponent,
-    TimesheetApprovalComponent
+    TimesheetApprovalComponent,
+    ModeOfStudyComponent
     
   ],
   imports: [
