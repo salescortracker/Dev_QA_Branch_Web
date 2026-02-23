@@ -1615,4 +1615,56 @@ bulkUploadCertificationTypes(data: CertificationType[]): Observable<any> {
   return path.split('/').pop() || 'download';
 }
 
+<<<<<<< Updated upstream
+=======
+getAllModeOfStudy(userId: number) {
+  debugger;
+  return this.http.get<any>(
+    `${this.baseUrl}/MasterData/GetAllModeOfStudy?userId=${userId}`
+  );
+}
+
+createModeOfStudy(data: ModeOfStudy) {
+  debugger;
+  return this.http.post(
+    `${this.baseUrl}/MasterData/CreateModeOfStudy`,
+    data
+  );
+}
+
+updateModeOfStudy(data: any) {
+  return this.http.put(
+    `${this.baseUrl}/MasterData/UpdateModeOfStudy`,
+    data
+  );
+}
+
+deleteModeOfStudy(id: number) {
+  debugger;
+  return this.http.delete(
+    `${this.baseUrl}/MasterData/DeleteModeOfStudy/${id}`
+  );
+}
+
+
+
+
+
+
+  createEvent(data: any) {
+    return this.http.post(`${this.baseUrl}/MasterData/createevents`, data);
+  }
+
+  updateEvent(data: any) {
+    return this.http.put(`${this.baseUrl}/MasterData/UpdateEvents`, data);
+  }
+
+  getEvents() {
+    return this.http.get<any[]>(`${this.baseUrl}/MasterData/eventss`);
+  }
+
+  deleteEvent(id: number) {
+    return this.http.delete(`${this.baseUrl}/MasterData/DeleteEvents/${id}`);
+  }
+>>>>>>> Stashed changes
 }

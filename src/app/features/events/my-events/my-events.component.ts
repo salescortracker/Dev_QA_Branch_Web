@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { AdminService } from '../../../admin/servies/admin.service';
 @Component({
   selector: 'app-my-events',
   standalone: false,
@@ -7,11 +7,16 @@ import { Component } from '@angular/core';
   styleUrl: './my-events.component.css'
 })
 export class MyEventsComponent {
-events = [
-  { name: 'Annual Awards', type: 'Company Event', date: new Date('2025-10-15'), description: 'Recognizing top performers.' },
-  { name: 'Diwali Holiday', type: 'Holiday', date: new Date('2025-11-02'), description: 'Office closed for Diwali.' },
-  { name: 'HR Policy Update', type: 'Announcement', date: new Date('2025-10-10'), description: 'New HR policy released.' },
-  { name: 'Team Outing', type: 'Event', date: new Date('2025-10-20'), description: 'Annual team bonding event.' },
-];
+  events: any[] = [];
 
+ constructor(private adminService: AdminService) {}
+
+  ngOnInit(): void {
+    this.loadEvents();
+  }
+
+loadEvents() {
+    this.adminService.getEvents()
+      .subscribe(res => this.events = res);
+  }
 }
